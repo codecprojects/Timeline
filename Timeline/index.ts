@@ -1,8 +1,21 @@
 import {IInputs, IOutputs} from "./generated/ManifestTypes";
 import DataSetInterfaces = ComponentFramework.PropertyHelper.DataSetApi;
 type DataSet = ComponentFramework.PropertyTypes.DataSet;
+const visTimeLine = require("vis/lib/timeline/Timeline");
+const visDataSet = require("vis/lib/DataSet")
+const moment = require("moment")
+const RowRecordId:string = "rowRecId";
 
-export class Timeline implements ComponentFramework.StandardControl<IInputs, IOutputs> {
+export class BasicTimeline implements ComponentFramework.StandardControl<IInputs, IOutputs> {
+
+	// Cached context object for the latest updateView
+	private contextObj: ComponentFramework.Context<IInputs>;
+		
+	// Div element created as part of this control's main container
+	private mainContainer: HTMLDivElement;
+	private visuContainer: HTMLDivElement;
+	private timeline : any;
+	private _notifyOutputChanged: () => void;
 
 	/**
 	 * Empty constructor.
@@ -22,7 +35,21 @@ export class Timeline implements ComponentFramework.StandardControl<IInputs, IOu
 	 */
 	public init(context: ComponentFramework.Context<IInputs>, notifyOutputChanged: () => void, state: ComponentFramework.Dictionary, container:HTMLDivElement)
 	{
-		// Add control initialization code
+		// Need to track container resize so that control could get the available width. The available height won't be provided even this is true
+			context.mode.trackContainerResize(true);
+			this._notifyOutputChanged = notifyOutputChanged;
+
+			// Create main table container div. 
+			this.mainContainer = document.createElement("div");
+			this.visuContainer = document.createElement("div");
+			this.visuContainer.setAttribute("id","visualisation");
+			this.mainContainer.appendChild(this.visuContainer);
+			container.appendChild(this.mainContainer);
+
+			
+
+			
+
 	}
 
 
@@ -32,8 +59,93 @@ export class Timeline implements ComponentFramework.StandardControl<IInputs, IOu
 	 */
 	public updateView(context: ComponentFramework.Context<IInputs>): void
 	{
-		// Add code to update control view
+		this.contextObj = context;
+		if(!context.parameters.dataSetGrid.loading){
+				
+			// Get sorted columns on View
+			let columnsOnView = this.getSortedColumnsOnView(context);
+
+			if (!columnsOnView || columnsOnView.length === 0) {
+				return;
+			}
+
+			this.createTimeLine(columnsOnView,context.parameters.dataSetGrid);
+		}
 	}
+
+	private createTimeLine(columnsOnView: DataSetInterfaces.Column[], ratings: DataSet){
+		const dateColumn1 = 'scheduledstart';
+		const dateColumn2 = 'scheduledend';
+		const labelColumn = 'subject';
+
+		if(ratings.sortedRecordIds.length > 0)
+		{
+			var timeLineItems = new visDataSet([]);
+			let i=0;
+			
+
+			for(let currentRecordId of ratings.sortedRecordIds){
+				let startdate = ratings.records[currentRecordId].getFormattedValue(dateColumn1);
+				let enddate = ratings.records[currentRecordId].getFormattedValue(dateColumn2);
+				let label = ratings.records[currentRecordId].getFormattedValue(labelColumn);
+
+				if(startdate!= null && startdate != "" && label!= null && label != "")
+				{
+					let item = {
+						id: ++i,
+						content:label,
+						start: moment(startdate,"D/MM/YYYY h:mm A").format('YYYY-MM-DD h:mm A'),
+						end : (enddate!=null) ? moment(enddate,"D/MM/YYYY h:mm A").format('YYYY-MM-DD h:mm A') : "",
+						type : this.DateDiff(enddate,startdate)<1 ? 'point' : 'box',
+						title: ""
+					}
+					item["title"] = (item.end!="") ? item.start + "  -  " + item.end : item.start;
+					timeLineItems._addItem(item); 
+				}
+			}
+
+				// Configuration for the Timeline
+			var options = {};
+
+			// Create a Timeline
+			if(!this.timeline)
+				this.timeline = new visTimeLine(this.visuContainer, timeLineItems, options);			
+		}
+	}
+
+	private DateDiff(end:any,start:any):number{
+		if(end!=null && start!=null){
+			return moment(end,"D/MM/YYYY h:mm A").diff(moment(start,"D/MM/YYYY h:mm A"),'days');
+		}
+		else
+		return -1;
+		
+	}
+
+		/**
+		 * Get sorted columns on view
+		 * @param context 
+		 * @return sorted columns object on View
+		 */
+		private getSortedColumnsOnView(context: ComponentFramework.Context<IInputs>): DataSetInterfaces.Column[]
+		{
+			if (!context.parameters.dataSetGrid.columns) {
+				return [];
+			}
+			
+			let columns =context.parameters.dataSetGrid.columns
+				.filter(function (columnItem:DataSetInterfaces.Column) { 
+					// some column are supplementary and their order is not > 0
+					return columnItem.order >= 0 }
+				);
+			
+			// Sort those columns so that they will be rendered in order
+			columns.sort(function (a:DataSetInterfaces.Column, b: DataSetInterfaces.Column) {
+				return a.order - b.order;
+			});
+			
+			return columns;
+		}
 
 	/** 
 	 * It is called by the framework prior to a control receiving new data. 
@@ -52,5 +164,4 @@ export class Timeline implements ComponentFramework.StandardControl<IInputs, IOu
 	{
 		// Add code to cleanup control if necessary
 	}
-
 }
