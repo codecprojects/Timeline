@@ -1,19 +1,3 @@
-Skip to content
- 
-Search or jump to…
-
-Pull requests
-Issues
-Marketplace
-Explore
- 
-@S00083446 
-Code  Issues 0  Pull requests 0  Projects 0  Wiki  Security  Pulse  Community
-CRM.Timeline/CRM.Timeline/BasicTimeline/ControlManifest.Input.xml
-@MannyGrewal MannyGrewal Initial version
-f98d0ce on 3 Jun
-16 lines (16 sloc)  789 Bytes
-    
 <?xml version="1.0" encoding="utf-8" ?>
 <manifest>
   <control namespace="Giles" constructor="BasicTimeline" version="0.0.21" display-name-key="CRM Timeline" description-key="A timeline based chronological view" control-type="standard">
