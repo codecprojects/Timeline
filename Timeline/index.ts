@@ -45,12 +45,7 @@ export class BasicTimeline implements ComponentFramework.StandardControl<IInputs
 			this.visuContainer.setAttribute("id","visualisation");
 			this.mainContainer.appendChild(this.visuContainer);
 			container.appendChild(this.mainContainer);
-
-			
-
-			
-
-	}
+}
 
 
 	/**
