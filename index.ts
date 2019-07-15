@@ -2,8 +2,9 @@ import {IInputs, IOutputs} from "./generated/ManifestTypes";
 import DataSetInterfaces = ComponentFramework.PropertyHelper.DataSetApi;
 type DataSet = ComponentFramework.PropertyTypes.DataSet;
 const visTimeLine = require("vis/lib/timeline/Timeline");
-const visDataSet = require("vis/lib/DataSet")
-const moment = require("moment")
+const visDataSet = require("vis/lib/DataSet");
+const moment = require("moment");
+
 const RowRecordId:string = "rowRecId";
 
 export class BasicTimeline implements ComponentFramework.StandardControl<IInputs, IOutputs> {
@@ -45,13 +46,7 @@ export class BasicTimeline implements ComponentFramework.StandardControl<IInputs
 			this.visuContainer.setAttribute("id","visualisation");
 			this.mainContainer.appendChild(this.visuContainer);
 			container.appendChild(this.mainContainer);
-
-			
-
-			
-
 	}
-
 
 	/**
 	 * Called when any value in the property bag has changed. This includes field values, data-sets, global values such as container height and width, offline status, control metadata values such as label, visible, etc.
