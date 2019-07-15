@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <manifest>
-  <control namespace="Giles" constructor="BasicTimeline" version="0.0.21" display-name-key="CRM Timeline" description-key="A timeline based chronological view" control-type="standard">
+<control namespace="Giles" constructor="BasicTimeline" version="0.0.21" display-name-key="CRM Timeline" description-key="A timeline based chronological view" control-type="standard">
     <!-- property node identifies a specific, configurable piece of data that the control expects from CDS -->
       <data-set name="dataSetGrid" display-name-key="VeriTimeline">
 	  </data-set>
